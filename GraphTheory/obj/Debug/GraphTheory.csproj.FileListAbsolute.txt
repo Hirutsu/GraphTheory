@@ -1,0 +1,6 @@
+G:\GIT\GraphTheory\GraphTheory\obj\Debug\GraphTheory.csproj.CoreCompileInputs.cache
+G:\GIT\GraphTheory\GraphTheory\bin\Debug\GraphTheory.exe.config
+G:\GIT\GraphTheory\GraphTheory\bin\Debug\GraphTheory.exe
+G:\GIT\GraphTheory\GraphTheory\bin\Debug\GraphTheory.pdb
+G:\GIT\GraphTheory\GraphTheory\obj\Debug\GraphTheory.exe
+G:\GIT\GraphTheory\GraphTheory\obj\Debug\GraphTheory.pdb
