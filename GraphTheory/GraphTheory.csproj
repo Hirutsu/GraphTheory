@@ -51,7 +51,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="InPutGraph.txt" />
+    <Content Include="NoOriNoWei.txt" />
+    <Content Include="NoOriWei.txt" />
+    <Content Include="OriNoWeiGraph.txt" />
+    <Content Include="OriWeiGraph.txt" />
     <Content Include="OutPutGraph.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
