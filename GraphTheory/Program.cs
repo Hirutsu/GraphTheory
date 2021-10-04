@@ -10,27 +10,9 @@ namespace GraphTheory
     {
         static void Main(string[] args)
         {
-            string str = @"G:\GIT\GraphTheory\GraphTheory\Graph.txt";
+            string str = @"C:\Users\burchuladzela\Desktop\GraphTheory\GraphTheory\InPutGraph.txt";
             Graph graph = new Graph(str);
             graph.ShowToConsole();
-
-            graph.DeleteVertex("5");
-            Console.WriteLine();
-
-            graph.ShowToConsole();
-            Console.WriteLine();
-
-            graph.DeleteEdge("1","2");
-            Console.WriteLine();
-            graph.ShowToConsole();
-
-            graph.Oriented = false;
-            graph.DeleteEdge("3", "4");
-            Console.WriteLine();
-            graph.ShowToConsole();
-
-            str = @"G:\GIT\GraphTheory\GraphTheory\OutPutGraph.txt";
-            graph.OutPutInFile(str);
         }
     }
 }

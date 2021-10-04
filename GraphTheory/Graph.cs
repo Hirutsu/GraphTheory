@@ -11,6 +11,7 @@ namespace GraphTheory
     {
         private Dictionary<string, Dictionary<string, int>> _graph;
         private bool _oriented = true;
+        private bool _weighed = true;
 
         public bool Oriented
         {
@@ -21,6 +22,18 @@ namespace GraphTheory
             set
             {
                 _oriented = value;
+            }
+        }
+
+        public bool Weighed
+        {
+            get
+            {
+                return _weighed;
+            }
+            set
+            {
+                _weighed = value;
             }
         }
 
@@ -40,19 +53,31 @@ namespace GraphTheory
         }
 
         //конструктор добавления из файла
-        public Graph(string filePath = @"G:\GIT\GraphTheory\GraphTheory\Graph.txt")
+        public Graph(string filePath = null)
         {
             _graph = new Dictionary<string, Dictionary<string, int>>();
             using (StreamReader file = new StreamReader(filePath, Encoding.GetEncoding(1251)))
             {
+                string[] orAndWei = file.ReadLine().Split();
+
+                if (orAndWei[0] == "1")
+                    _oriented = true;
+                else
+                    _oriented = false;
+
+                if (orAndWei[1] == "1")
+                    _weighed = true;
+                else
+                    _weighed = false;
+
                 string tempStr;
                 string[] nodeStr;
-                Dictionary<string, int> nodes = new Dictionary<string, int>();
+                string[] nodesStr;
                 while ((tempStr = file.ReadLine()) != null)
                 {
-                    string[] nodesStr = tempStr.Split();
+                    nodesStr = tempStr.Split();
                     Dictionary<string, int> tempNextNodes = new Dictionary<string, int>();
-                    for(int i = 1; i<nodesStr.Length;i++)
+                    for (int i = 1; i < nodesStr.Length; i++)
                     {
                         nodeStr = nodesStr[i].Split(':');
                         tempNextNodes.Add(nodeStr[0], Convert.ToInt32(nodeStr[1]));
@@ -125,6 +150,15 @@ namespace GraphTheory
         //вывод в консоль
         public void ShowToConsole()
         {
+            if (Oriented)
+                Console.Write("1 ");
+            else
+                Console.Write("0");
+            if (Weighed)
+                Console.WriteLine("1");
+            else
+                Console.WriteLine("0");
+
             foreach (var keyValue in _graph)
             {
                 Console.Write(keyValue.Key +" ");
