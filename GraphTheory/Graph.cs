@@ -53,10 +53,10 @@ namespace GraphTheory
         }
 
         //конструктор добавления из файла
-        public Graph(string filePath = null)
+        public Graph(string filePath)
         {
             _graph = new Dictionary<string, Dictionary<string, int>>();
-            using (StreamReader file = new StreamReader(filePath, Encoding.GetEncoding(1251)))
+            using (StreamReader file = new StreamReader(@filePath, Encoding.GetEncoding(1251)))
             {
                 string[] orAndWei = file.ReadLine().Split();
 
@@ -67,7 +67,6 @@ namespace GraphTheory
 
                 if (orAndWei[1] == "1")
                     _weighed = true;
-                //
                 else
                     _weighed = false;
 
@@ -91,7 +90,8 @@ namespace GraphTheory
         //добавление вершины
         public void AddVertex(string nameNode)
         {
-            _graph.Add(nameNode, null);
+            Dictionary<string, int> dict = new Dictionary<string, int>();
+            _graph.Add(nameNode, dict);
         }
 
         //добавление ребра
