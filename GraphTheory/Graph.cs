@@ -67,6 +67,7 @@ namespace GraphTheory
 
                 if (orAndWei[1] == "1")
                     _weighed = true;
+                //
                 else
                     _weighed = false;
 
