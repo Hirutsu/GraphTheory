@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -190,17 +191,48 @@ namespace GraphTheory
             return deletedEdge;
         }
 
-        public void ShowIsolatedNode()
+        public Dictionary<string,bool> GetNoJoint(string node)
+        {
+            Dictionary<string, bool> degree = new Dictionary<string, bool>();
+            foreach (var keyValue in _graph)
+            {
+                degree[keyValue.Key] = false;
+            }
+            degree[node] = true;
+            foreach(var item in _graph)
+            {
+                if(item.Value.ContainsKey(node))
+                {
+                    degree[item.Key] = true;
+                }
+            }
+            Dictionary<string, int> tempDic = _graph[node];
+            foreach(var item in tempDic)
+            {
+                degree[item.Key] = true;
+            }
+            return degree;
+        }
+
+        public Dictionary<string,int> GetDegreeNode()
         {
             Dictionary<string, int> degree = new Dictionary<string, int>();
+            foreach(var keyValue in _graph)
+            {
+                degree[keyValue.Key] = 0;
+            }
+
             foreach (var keyValue in _graph)
             {
                 foreach (var keyValue2 in keyValue.Value)
                 {
-                    //if (keyValue2)
+                    if (degree.ContainsKey(keyValue2.Key))
+                    {
+                        degree[keyValue2.Key] += 1;
+                    }
                 }
             }
-            Console.WriteLine();
+            return degree;
         }
 
         //вывод в консоль

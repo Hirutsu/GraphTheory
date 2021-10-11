@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,20 +60,20 @@ namespace GraphTheory
                 Console.WriteLine("4.Неориетированный невзвешенный: ");
                 string filePath = Console.ReadLine();
                 if (filePath == "1")
-                    graph = new Graph(@"C:\Users\burchuladzela\Desktop\GraphTheory\GraphTheory\OriWeiGraph.txt");
+                    graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\OriWeiGraph.txt");
                 else if (filePath == "2")
-                    graph = new Graph(@"C:\Users\burchuladzela\Desktop\GraphTheory\GraphTheory\OriNoWeiGraph.txt");
+                    graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\OriNoWeiGraph.txt");
                 else if (filePath == "3")
-                    graph = new Graph(@"C:\Users\burchuladzela\Desktop\GraphTheory\GraphTheory\NoOriWei.txt");
+                    graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\NoOriWei.txt");
                 else
-                    graph = new Graph(@"C:\Users\burchuladzela\Desktop\GraphTheory\GraphTheory\NoOriNoWei.txt");
+                    graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\NoOriNoWei.txt");
             }
             else
             {
                 Console.WriteLine("Неправильно,начните заново");
                 goto start;
             }
-            while(num != 8)
+            while(num != 0)
             {
                 Console.WriteLine("Меню для работы с графом:");
                 Console.WriteLine("1.Добавить вершину");
@@ -82,7 +83,9 @@ namespace GraphTheory
                 Console.WriteLine("5.Просмотреть граф в консоли");
                 Console.WriteLine("6.Загрузить в файл");
                 Console.WriteLine("7.Вывести все изолированные вершины");
-                Console.WriteLine("8.Выйти из програамы");
+                Console.WriteLine("8.Вывести все вершины,не смежные с данной");
+                Console.WriteLine("9.Удалить висячие вершины");
+                Console.WriteLine("0.Выйти из програамы");
                 Console.Write("Введите число:");
                 Int32.TryParse(Console.ReadLine(),out num);
                 string str;
@@ -143,9 +146,9 @@ namespace GraphTheory
                         {
                             Console.Write("Введите ('из', 'куда') для добавления ребра: ");
                             strArr = Console.ReadLine().Split();
-                            if (strArr.Length == 3 && int.TryParse(strArr[2], out _))
+                            if (strArr.Length == 2 && int.TryParse(strArr[2], out _))
                             {
-                                if (graph.AddEdge(strArr[0], strArr[1], Convert.ToInt32(strArr[2])))
+                                if (graph.AddEdge(strArr[0], strArr[1]))
                                 {
                                     Console.WriteLine("Ребро добавлено");
                                 }
@@ -193,10 +196,45 @@ namespace GraphTheory
                     case 7:
                         Console.WriteLine();
                         Console.Write("Изолированные вершины: ");
-                        graph.ShowIsolatedNode();
+                        Dictionary<string,int> arr = graph.GetDegreeNode();
+                        foreach (var item in arr)
+                        {
+                            if(item.Value == 0)
+                            {
+                                Console.Write(item.Key+" ");
+                            }
+                        }
                         Console.WriteLine();
                         break;
                     case 8:
+                        Console.WriteLine();
+                        Console.Write("Введите вершину:");
+                        str = Console.ReadLine();
+                        Dictionary<string,bool> dictionary = graph.GetNoJoint(str);
+                        Console.Write("Не взвешенные вершины с вершиной {0}: ", str);
+                        foreach(var item in dictionary)
+                        {
+                            if(item.Value == false)
+                            {
+                                Console.Write(item.Key+" ");
+                            }
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 9:
+                        Console.WriteLine();
+                        Console.WriteLine("Происходит удаление висячих вершин,подождите...");
+                        arr = graph.GetDegreeNode();
+                        foreach(var item in arr)
+                        {
+                            if(item.Value == 1)
+                            {
+                                graph.DeleteVertex(item.Key);
+                            }
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 0:
                         Console.WriteLine();
                         Console.WriteLine("Выход из программы!");
                         Console.WriteLine();
