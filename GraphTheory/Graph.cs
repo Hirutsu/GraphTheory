@@ -109,24 +109,34 @@ namespace GraphTheory
         }
 
         //удаление вершины
-        public void DeleteVertex(string nameNode)
+        public bool DeleteVertex(string nameNode)
         {
-            _graph.Remove(nameNode);
+            bool deleted = _graph.Remove(nameNode);
             foreach (var keyValue in _graph)
             {
                 _graph[keyValue.Key].Remove(nameNode);
             }
+            if(deleted)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         //удаление ребра
-        public void DeleteEdge(string fromNode,string toNode)
+        public bool DeleteEdge(string fromNode,string toNode)
         {
+            bool deletedEdge = false;
             if(_oriented)
             {
                 foreach (var keyValue in _graph)
                 {
                     if(keyValue.Key.Equals(fromNode))
                     {
+                        deletedEdge = true;
                         _graph[keyValue.Key].Remove(toNode);
                     }
                 }
@@ -137,6 +147,7 @@ namespace GraphTheory
                 {
                     if (keyValue.Key.Equals(fromNode))
                     {
+                        deletedEdge = true;
                         _graph[keyValue.Key].Remove(toNode);
                     }
                     if (keyValue.Key.Equals(toNode))
@@ -144,13 +155,27 @@ namespace GraphTheory
                         _graph[keyValue.Key].Remove(fromNode);
                     }
                 }
-
             }
+            return deletedEdge;
+        }
+
+        public void ShowIsolatedNode()
+        {
+            Dictionary<string, int> degree = new Dictionary<string, int>();
+            foreach (var keyValue in _graph)
+            {
+                foreach (var keyValue2 in keyValue.Value)
+                {
+                    //if (keyValue2)
+                }
+            }
+            Console.WriteLine();
         }
 
         //вывод в консоль
         public void ShowToConsole()
         {
+            Console.WriteLine();
             if (Oriented)
                 Console.Write("1 ");
             else
@@ -162,13 +187,21 @@ namespace GraphTheory
 
             foreach (var keyValue in _graph)
             {
-                Console.Write(keyValue.Key +" ");
+                Console.Write(keyValue.Key + "->");
                 foreach(var keyValue2 in keyValue.Value)
                 {
-                    Console.Write(keyValue2.Key + ":" + keyValue2.Value + " ");
+                    if(_weighed)
+                    {
+                        Console.Write(keyValue2.Key + ":" + keyValue2.Value + " ");
+                    }
+                    else
+                    {
+                        Console.Write(keyValue2.Key + " ");
+                    }
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
         }
 
         //вывод в файл
