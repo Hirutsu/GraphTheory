@@ -14,7 +14,7 @@ namespace GraphTheory
             int num = 1;
             Console.WriteLine("Чтобы работать с графом нужно его создать:");
             Console.Write("Нажмите 1 -создать пустой граф; 2 - считать с файла: ");
-            num = Convert.ToInt32(Console.ReadLine());
+            Int32.TryParse(Console.ReadLine(), out num);
             Graph graph = new Graph();
             if(num == 1)
             {
@@ -25,9 +25,14 @@ namespace GraphTheory
                 {
                     graph.Oriented = true;
                 }
-                if(str =="Нет")
+                else if (str =="Нет")
                 {
                         graph.Oriented = false;
+                }
+                else
+                {
+                    Console.WriteLine("Не понимаю вас,введите заново");
+                    goto start;
                 }
                 Console.Write("Граф будет взвешенным? ");
                 str = Console.ReadLine();
@@ -35,9 +40,14 @@ namespace GraphTheory
                 {
                     graph.Weighed = true;
                 }
-                if (str == "Нет")
+                else if (str == "Нет")
                 {
                     graph.Weighed = false;
+                }
+                else
+                {
+                                        Console.WriteLine("Не понимаю вас,введите заново");
+                    goto start;
                 }
             }
             else if (num == 2)
@@ -74,7 +84,7 @@ namespace GraphTheory
                 Console.WriteLine("7.Вывести все изолированные вершины");
                 Console.WriteLine("8.Выйти из програамы");
                 Console.Write("Введите число:");
-                num = Convert.ToInt32(Console.ReadLine());
+                Int32.TryParse(Console.ReadLine(),out num);
                 string str;
                 string[] strArr;
                 switch (num)
@@ -83,7 +93,14 @@ namespace GraphTheory
                         Console.WriteLine();
                         Console.Write("Введите название вершнины,которую нужно добавить: ");
                         str = Console.ReadLine();
-                        graph.AddVertex(str);
+                        if(graph.AddVertex(str))
+                        {
+                            Console.WriteLine("Вершина добавлена");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Такая вершина уже есть! Добавлять можно только новые");
+                        }
                         Console.WriteLine();
                         break;
                     case 2:
@@ -102,18 +119,58 @@ namespace GraphTheory
                         break;
                     case 3:
                         Console.WriteLine();
-                        Console.Write("Введите ('из', 'куда', 'вес') для добавления ребра: ");
-                        strArr = Console.ReadLine().Split();
-                        graph.AddEdge(strArr[0], strArr[1], Convert.ToInt32(strArr[2]));
+                        if (graph.Weighed)
+                        {
+                            Console.Write("Введите ('из', 'куда', 'вес') для добавления ребра: ");
+                            strArr = Console.ReadLine().Split();
+                            if (strArr.Length == 3 && int.TryParse(strArr[2], out _))
+                            {
+                                if (graph.AddEdge(strArr[0], strArr[1], Convert.ToInt32(strArr[2])))
+                                {
+                                    Console.WriteLine("Ребро добавлено");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Нет вершины или есть ребро, добавление ребра не выполнено");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Введены неверно данные");
+                            }
+                        }
+                        else
+                        {
+                            Console.Write("Введите ('из', 'куда') для добавления ребра: ");
+                            strArr = Console.ReadLine().Split();
+                            if (strArr.Length == 3 && int.TryParse(strArr[2], out _))
+                            {
+                                if (graph.AddEdge(strArr[0], strArr[1], Convert.ToInt32(strArr[2])))
+                                {
+                                    Console.WriteLine("Ребро добавлено");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Нет вершины или есть ребро, добавление ребра не выполнено");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Введены неверно данные");
+                            }
+                        }
                         Console.WriteLine();
                         break;
                     case 4:
                         Console.WriteLine();
                         Console.Write("Введите ('из', 'куда') для удаления ребра: ");
                         strArr = Console.ReadLine().Split();
-                        if (graph.DeleteEdge(strArr[0], strArr[1]))
+                        if(strArr.Length == 2)
                         {
-                            Console.WriteLine("Ребро удалено");
+                            if (graph.DeleteEdge(strArr[0], strArr[1]))
+                            {
+                                Console.WriteLine("Ребро удалено");
+                            }
                         }
                         else
                         {

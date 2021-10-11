@@ -88,23 +88,53 @@ namespace GraphTheory
         }
 
         //добавление вершины
-        public void AddVertex(string nameNode)
+        public bool AddVertex(string nameNode)
         {
             Dictionary<string, int> dict = new Dictionary<string, int>();
-            _graph.Add(nameNode, dict);
+            if(_graph.ContainsKey(nameNode))
+            {
+                return false;
+            }
+            {
+                _graph.Add(nameNode, dict);
+                return true;
+            }
         }
 
         //добавление ребра
-        public void AddEdge(string fromNode, string toNode, int weight)
+        public bool AddEdge(string fromNode, string toNode, int weight = 0)
         {
             if(_oriented)
             {
-                _graph[fromNode].Add(toNode, weight);
+                if (_graph[fromNode].ContainsKey(toNode) == false && _graph[fromNode].ContainsKey(toNode) == false)
+                {
+                    _graph[fromNode].Add(toNode, weight);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                _graph[fromNode].Add(toNode, weight);
-                _graph[toNode].Add(fromNode, weight);
+                if(_graph.ContainsKey(fromNode) && _graph.ContainsKey(toNode))
+                {
+                    if(_graph[fromNode].ContainsKey(toNode) == false && _graph[fromNode].ContainsKey(toNode) == false)
+                    {
+                        _graph[fromNode].Add(toNode, weight);
+                        _graph[toNode].Add(fromNode, weight);
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
@@ -130,11 +160,15 @@ namespace GraphTheory
         public bool DeleteEdge(string fromNode,string toNode)
         {
             bool deletedEdge = false;
+            if(String.IsNullOrEmpty(fromNode) || String.IsNullOrEmpty(toNode))
+            {
+                return false;
+            }
             if(_oriented)
             {
                 foreach (var keyValue in _graph)
                 {
-                    if(keyValue.Key.Equals(fromNode))
+                    if (keyValue.Key.Equals(fromNode) && keyValue.Value.ContainsKey(toNode))
                     {
                         deletedEdge = true;
                         _graph[keyValue.Key].Remove(toNode);
@@ -145,13 +179,10 @@ namespace GraphTheory
             {
                 foreach (var keyValue in _graph)
                 {
-                    if (keyValue.Key.Equals(fromNode))
+                    if (keyValue.Key.Equals(fromNode) && keyValue.Value.ContainsKey(toNode) || keyValue.Key.Equals(toNode) && keyValue.Value.ContainsKey(fromNode))
                     {
                         deletedEdge = true;
                         _graph[keyValue.Key].Remove(toNode);
-                    }
-                    if (keyValue.Key.Equals(toNode))
-                    {
                         _graph[keyValue.Key].Remove(fromNode);
                     }
                 }
