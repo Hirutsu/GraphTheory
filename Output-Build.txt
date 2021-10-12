@@ -1,4 +1,0 @@
-﻿Build started...
-1>------ Build started: Project: GraphTheory, Configuration: Debug Any CPU ------
-1>G:\GIT\GraphTheory\GraphTheory\Program.cs(126,85,126,85): error CS1026: ) expected
-========== Build: 0 succeeded, 1 failed, 0 up-to-date, 0 skipped ==========

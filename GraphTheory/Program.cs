@@ -229,7 +229,7 @@ namespace GraphTheory
                         break;
                     case 9:
                         Console.WriteLine();
-                        Console.WriteLine("Происходит удаление висячих вершин,подождите...");
+                        Console.WriteLine("Происходит удаление висячих вершин,подождите... ");
                         nodes = graph.GetNodes();
                         flag = false;
                         for (int i = 0; i < nodes.Length; i++)
