@@ -191,54 +191,66 @@ namespace GraphTheory
             return deletedEdge;
         }
 
-        public Dictionary<string,bool> GetNoJoint(string node)
+        public Dictionary<string,int> GetNoJoint(string node)
         {
-            Dictionary<string, bool> degree = new Dictionary<string, bool>();
+            Dictionary<string, int> degree = new Dictionary<string, int>();
             foreach (var keyValue in _graph)
             {
-                degree[keyValue.Key] = false;
+                degree[keyValue.Key] = 0;
             }
-            degree[node] = true;
+            degree[node] = 1;
             foreach(var item in _graph)
             {
                 if(item.Value.ContainsKey(node))
                 {
-                    degree[item.Key] = true;
+                    degree[item.Key] += 1;
                 }
             }
             Dictionary<string, int> tempDic = _graph[node];
             foreach(var item in tempDic)
             {
-                degree[item.Key] = true;
+                degree[item.Key] += 1;
             }
             return degree;
         }
-
-        public Dictionary<string,int> GetDegreeNode()
+        //все вершины графа
+        public string[] GetNodes()
         {
-            Dictionary<string, int> degree = new Dictionary<string, int>();
-            foreach(var keyValue in _graph)
+            string[] node = new string[_graph.Count];
+            int i = 0;
+            foreach(var item in _graph)
             {
-                degree[keyValue.Key] = 0;
+                node[i] = item.Key;
+                i++;
             }
-
+            return node;
+        }
+        //подсчет степени выхода
+        public int GetCountOutDegree(string node)
+        {
+            return _graph[node].Count;
+        }
+        //подсчет степени входа
+        public int GetCountInDegreeNode(string node)
+        {
+            int count = 0;
             foreach (var keyValue in _graph)
             {
                 foreach (var keyValue2 in keyValue.Value)
                 {
-                    if (degree.ContainsKey(keyValue2.Key))
+                    if (keyValue2.Key == node)
                     {
-                        degree[keyValue2.Key] += 1;
+                        count++;
                     }
                 }
             }
-            return degree;
+            return count;
         }
 
         //вывод в консоль
         public void ShowToConsole()
         {
-            Console.WriteLine();
+/*            Console.WriteLine();
             if (Oriented)
                 Console.Write("1 ");
             else
@@ -247,7 +259,7 @@ namespace GraphTheory
                 Console.WriteLine("1");
             else
                 Console.WriteLine("0");
-
+*/
             foreach (var keyValue in _graph)
             {
                 Console.Write(keyValue.Key + "->");

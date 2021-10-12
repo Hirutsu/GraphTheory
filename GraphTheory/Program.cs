@@ -183,6 +183,7 @@ namespace GraphTheory
                         break;
                     case 5:
                         Console.WriteLine();
+                        graph.GetNodes();
                         graph.ShowToConsole();
                         Console.WriteLine();
                         break;
@@ -190,19 +191,24 @@ namespace GraphTheory
                         Console.WriteLine();
                         Console.WriteLine("Введите ссылку на файл");
                         str = Console.ReadLine();
-                        graph.OutPutInFile(str);
                         Console.WriteLine();
                         break;
                     case 7:
                         Console.WriteLine();
                         Console.Write("Изолированные вершины: ");
-                        Dictionary<string,int> arr = graph.GetDegreeNode();
-                        foreach (var item in arr)
+                        string[] nodes = graph.GetNodes();
+                        bool flag = false;
+                        for(int i=0;i<nodes.Length;i++)
                         {
-                            if(item.Value == 0)
+                            if(graph.GetCountInDegreeNode(nodes[i])==0 && graph.GetCountOutDegree(nodes[i]) == 0)
                             {
-                                Console.Write(item.Key+" ");
+                                Console.Write(nodes[i] + " ");
+                                flag = true;
                             }
+                        }
+                        if (flag == false)
+                        {
+                            Console.Write("Таких вершин нет");
                         }
                         Console.WriteLine();
                         break;
@@ -210,11 +216,11 @@ namespace GraphTheory
                         Console.WriteLine();
                         Console.Write("Введите вершину:");
                         str = Console.ReadLine();
-                        Dictionary<string,bool> dictionary = graph.GetNoJoint(str);
-                        Console.Write("Не взвешенные вершины с вершиной {0}: ", str);
+                        Dictionary<string,int> dictionary = graph.GetNoJoint(str);
+                        Console.Write("Не смежные вершины с вершиной {0}: ", str);
                         foreach(var item in dictionary)
                         {
-                            if(item.Value == false)
+                            if(item.Value == 0)
                             {
                                 Console.Write(item.Key+" ");
                             }
@@ -224,13 +230,25 @@ namespace GraphTheory
                     case 9:
                         Console.WriteLine();
                         Console.WriteLine("Происходит удаление висячих вершин,подождите...");
-                        arr = graph.GetDegreeNode();
-                        foreach(var item in arr)
+                        nodes = graph.GetNodes();
+                        flag = false;
+                        for (int i = 0; i < nodes.Length; i++)
                         {
-                            if(item.Value == 1)
+                            //Console.WriteLine(nodes[i] + " " + graph.GetCountInDegreeNode(nodes[i]) + " " + graph.GetCountOutDegree(nodes[i]));
+                            if (graph.GetCountInDegreeNode(nodes[i]) == 1 && graph.GetCountOutDegree(nodes[i]) <= 1)
                             {
-                                graph.DeleteVertex(item.Key);
+                                graph.DeleteVertex(nodes[i]);
+                                flag = true;
                             }
+                        }
+                        if (flag == false)
+                        {
+                            Console.Write("Таких вершин нет");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Удаление завершено,теперь такой граф:");
+                            graph.ShowToConsole();
                         }
                         Console.WriteLine();
                         break;
