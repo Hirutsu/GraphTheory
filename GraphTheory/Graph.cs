@@ -10,10 +10,13 @@ namespace GraphTheory
 {
     class Graph
     {
+        //список смежности
         private Dictionary<string, Dictionary<string, int>> _graph;
+        //(не)ориентированный
         private bool _oriented = true;
+        //(не)взвешенный
         private bool _weighed = true;
-
+        //свойство ориентированности
         public bool Oriented
         {
             get
@@ -25,7 +28,7 @@ namespace GraphTheory
                 _oriented = value;
             }
         }
-
+        //свойство взвешенности
         public bool Weighed
         {
             get
@@ -37,7 +40,7 @@ namespace GraphTheory
                 _weighed = value;
             }
         }
-
+        //получить весь граф
         public Dictionary<string, Dictionary<string, int>> DictGraph
         {
             get
@@ -51,6 +54,25 @@ namespace GraphTheory
         public Graph()
         {
             _graph = new Dictionary<string, Dictionary<string, int>>();
+        }
+
+        //конструктор копирования
+        public Graph(Graph graph)
+        {
+            _oriented = graph.Oriented;
+            _weighed = graph.Weighed;
+            _graph = new Dictionary<string, Dictionary<string, int>>();
+            foreach (var item in graph.DictGraph)
+            {
+                string nameNode = "";
+                nameNode += item.Key;
+                Dictionary<string, int> vertex = new Dictionary<string, int>();
+                foreach (var items in item.Value)
+                {
+                    vertex.Add(items.Key, items.Value);
+                }
+                _graph.Add(nameNode, vertex);
+            }
         }
 
         //конструктор добавления из файла
@@ -191,6 +213,7 @@ namespace GraphTheory
             return deletedEdge;
         }
 
+        //поиск несмежных вершин с заданной
         public Dictionary<string,int> GetNoJoint(string node)
         {
             Dictionary<string, int> degree = new Dictionary<string, int>();
@@ -213,6 +236,7 @@ namespace GraphTheory
             }
             return degree;
         }
+
         //все вершины графа
         public string[] GetNodes()
         {
@@ -225,11 +249,13 @@ namespace GraphTheory
             }
             return node;
         }
+
         //подсчет степени выхода
         public int GetCountOutDegree(string node)
         {
             return _graph[node].Count;
         }
+
         //подсчет степени входа
         public int GetCountInDegreeNode(string node)
         {
@@ -247,19 +273,49 @@ namespace GraphTheory
             return count;
         }
 
+        //компоненты связности
+        public void BFS(ref Dictionary<string,bool> usedNodes){
+            Queue<string> vertex = new Queue<string>();
+            foreach (var item in usedNodes){
+                if (item.Value == false){
+                    vertex.Enqueue(item.Key);
+                    break;
+                }
+            }
+            while (vertex.Count != 0){
+                string vrtx = vertex.Peek();
+                if (usedNodes[vrtx] == false){
+                    usedNodes[vrtx] = true;
+                    foreach (var ver in _graph[vrtx]){
+                        if (usedNodes.Keys.Contains(ver.Key) && usedNodes[ver.Key] == false){
+                            usedNodes[ver.Key] = true;
+                            vertex.Enqueue(ver.Key);
+                        }
+                    }
+                }
+                else{
+                    vertex.Dequeue();
+                }
+            }
+            Console.Write("Компонента: ");
+            foreach (var component in usedNodes){
+                if (component.Value == true)
+                    Console.Write(component.Key + " ");
+            }
+            Dictionary<string, bool> tempDic = new Dictionary<string, bool>();
+            foreach (var item in usedNodes){
+                if (item.Value == false)
+                    tempDic.Add(item.Key, item.Value);
+            }
+            usedNodes.Clear();
+            foreach (var item in tempDic)
+                usedNodes.Add(item.Key, item.Value);
+            Console.WriteLine();
+        }
+
         //вывод в консоль
         public void ShowToConsole()
         {
-/*            Console.WriteLine();
-            if (Oriented)
-                Console.Write("1 ");
-            else
-                Console.Write("0");
-            if (Weighed)
-                Console.WriteLine("1");
-            else
-                Console.WriteLine("0");
-*/
             foreach (var keyValue in _graph)
             {
                 Console.Write(keyValue.Key + "->");

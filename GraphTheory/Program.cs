@@ -47,7 +47,7 @@ namespace GraphTheory
                 }
                 else
                 {
-                                        Console.WriteLine("Не понимаю вас,введите заново");
+                    Console.WriteLine("Не понимаю вас,введите заново");
                     goto start;
                 }
             }
@@ -58,6 +58,7 @@ namespace GraphTheory
                 Console.WriteLine("2.Ориентированный невзвешенный: ");
                 Console.WriteLine("3.Неориентированный взвешенный: ");
                 Console.WriteLine("4.Неориетированный невзвешенный: ");
+                Console.WriteLine("5.Для компоненты связности: ");
                 string filePath = Console.ReadLine();
                 if (filePath == "1")
                     graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\OriWeiGraph.txt");
@@ -65,8 +66,15 @@ namespace GraphTheory
                     graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\OriNoWeiGraph.txt");
                 else if (filePath == "3")
                     graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\NoOriWei.txt");
-                else
+                else if (filePath == "4")
                     graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\NoOriNoWei.txt");
+                else if (filePath == "5")
+                    graph = new Graph(@"G:\GIT\GraphTheory\GraphTheory\ComponentOri.txt");
+                else
+                {
+                    Console.WriteLine("Нет такого числа");
+                    return;
+                }
             }
             else
             {
@@ -85,6 +93,7 @@ namespace GraphTheory
                 Console.WriteLine("7.Вывести все изолированные вершины");
                 Console.WriteLine("8.Вывести все вершины,не смежные с данной");
                 Console.WriteLine("9.Удалить висячие вершины");
+                Console.WriteLine("10.Вывести компонент связности!");
                 Console.WriteLine("0.Выйти из програамы");
                 Console.Write("Введите число:");
                 Int32.TryParse(Console.ReadLine(),out num);
@@ -126,7 +135,8 @@ namespace GraphTheory
                         {
                             Console.Write("Введите ('из', 'куда', 'вес') для добавления ребра: ");
                             strArr = Console.ReadLine().Split();
-                            if (strArr.Length == 3 && int.TryParse(strArr[2], out _))
+                            string[] vertex = graph.GetNodes();
+                            if (strArr.Length == 3 && int.TryParse(strArr[2], out _) && vertex.Contains(strArr[0]) && vertex.Contains(strArr[1]))
                             {
                                 if (graph.AddEdge(strArr[0], strArr[1], Convert.ToInt32(strArr[2])))
                                 {
@@ -146,7 +156,8 @@ namespace GraphTheory
                         {
                             Console.Write("Введите ('из', 'куда') для добавления ребра: ");
                             strArr = Console.ReadLine().Split();
-                            if (strArr.Length == 2 && int.TryParse(strArr[2], out _))
+                            string[] vertex = graph.GetNodes();
+                            if (strArr.Length == 2 && vertex.Contains(strArr[0]) && vertex.Contains(strArr[1]))
                             {
                                 if (graph.AddEdge(strArr[0], strArr[1]))
                                 {
@@ -230,25 +241,52 @@ namespace GraphTheory
                     case 9:
                         Console.WriteLine();
                         Console.WriteLine("Происходит удаление висячих вершин,подождите... ");
+                        Graph newGraph = new Graph(graph);
                         nodes = graph.GetNodes();
                         flag = false;
-                        for (int i = 0; i < nodes.Length; i++)
-                        {
-                            //Console.WriteLine(nodes[i] + " " + graph.GetCountInDegreeNode(nodes[i]) + " " + graph.GetCountOutDegree(nodes[i]));
-                            if (graph.GetCountInDegreeNode(nodes[i]) == 1 && graph.GetCountOutDegree(nodes[i]) <= 1)
-                            {
-                                graph.DeleteVertex(nodes[i]);
-                                flag = true;
+                        List<string> hangNodes = new List<string>();
+                        for (int i = 0; i < nodes.Length; i++){
+                            if(graph.Oriented){
+                                if (graph.GetCountInDegreeNode(nodes[i]) == 1 && graph.GetCountOutDegree(nodes[i]) == 0){
+                                    hangNodes.Add(nodes[i]);
+                                    flag = true;
+                                }
                             }
+                            else{
+                                if (graph.GetCountInDegreeNode(nodes[i]) == 1 && graph.GetCountOutDegree(nodes[i]) == 1){
+                                    hangNodes.Add(nodes[i]);
+                                    flag = true;
+                                }
+                            }
+
                         }
-                        if (flag == false)
-                        {
+                        if (flag == false){
                             Console.Write("Таких вершин нет");
                         }
-                        else
-                        {
+                        else{
+                            foreach(var item in hangNodes){
+                                newGraph.DeleteVertex(item);
+                            }
                             Console.WriteLine("Удаление завершено,теперь такой граф:");
+                            newGraph.ShowToConsole();
+                            Console.WriteLine("Исходный граф");
                             graph.ShowToConsole();
+
+                        }
+                        Console.WriteLine();
+                        break;
+                    case 10:
+                        Console.WriteLine();
+                        Console.WriteLine("Происходит поиск компонент связности...");
+                        nodes = graph.GetNodes();
+                        Dictionary<string, bool> usedNodes = new Dictionary<string, bool>();
+                        for (int i = 0; i< nodes.Length; i++)
+                        {
+                            usedNodes.Add(nodes[i],false);
+                        }
+                        while(usedNodes.Count != 0)
+                        {
+                            graph.BFS(ref usedNodes);
                         }
                         Console.WriteLine();
                         break;

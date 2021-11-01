@@ -51,6 +51,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ComponentOri.txt" />
     <Content Include="NoOriNoWei.txt" />
     <Content Include="NoOriWei.txt" />
     <Content Include="OriNoWeiGraph.txt" />
