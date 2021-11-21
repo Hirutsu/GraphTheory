@@ -94,6 +94,9 @@ namespace GraphTheory
                 Console.WriteLine("8.Вывести все вершины,не смежные с данной");
                 Console.WriteLine("9.Удалить висячие вершины");
                 Console.WriteLine("10.Вывести компонент связности!");
+                Console.WriteLine("11.Найти вершину, сумма длин кратчайших путей от которой до остальных вершин минимальна.(6) - ДЕЙКСТРА");
+                Console.WriteLine("12.Вывести кратчайшие пути из вершин u1 и u2 до v.(15) - ФЛОЙД");
+                Console.WriteLine("13.Вывести кратчайшие пути из вершины u до v1 и v2.(13) - БЕЛМАН");
                 Console.WriteLine("0.Выйти из програамы");
                 Console.Write("Введите число:");
                 Int32.TryParse(Console.ReadLine(),out num);
@@ -195,7 +198,7 @@ namespace GraphTheory
                     case 5:
                         Console.WriteLine();
                         graph.GetNodes();
-                        graph.ShowToConsole();
+                        graph.ShowLstVertex();
                         Console.WriteLine();
                         break;
                     case 6:
@@ -268,9 +271,9 @@ namespace GraphTheory
                                 newGraph.DeleteVertex(item);
                             }
                             Console.WriteLine("Удаление завершено,теперь такой граф:");
-                            newGraph.ShowToConsole();
+                            newGraph.ShowLstVertex();
                             Console.WriteLine("Исходный граф");
-                            graph.ShowToConsole();
+                            graph.ShowLstVertex();
 
                         }
                         Console.WriteLine();
@@ -288,6 +291,135 @@ namespace GraphTheory
                         {
                             graph.BFS(ref usedNodes);
                         }
+                        Console.WriteLine();
+                        break;
+                    case 11:
+                        Console.WriteLine();
+                        List<List<int>> minweight = new List<List<int>>();
+                        for (int i = 0; i < graph.DictGraph.Count; i++)
+                        {
+                            minweight.Add(graph.Dijkstra(i));
+                        }
+                        int minSum = 0;
+                        int count = 0;
+                        int tmpSum = 0;
+                        int index = 0;
+
+                        for (int i = 0; i < minweight.Count; i++)
+                        {
+                            for (int j = 0; j < minweight[i].Count; j++)
+                            {
+                                Console.Write(minweight[i][j] + " ");
+                            }
+                            Console.WriteLine();
+                        }
+
+                        for (int i = 0; i < minweight.Count; i++)
+                        {
+                            count = 0;
+                            tmpSum = 0;
+                            for (int j = 0; j < minweight[i].Count; j++)
+                            {
+                                if(minweight[i][j] != int.MaxValue)
+                                {
+                                    tmpSum += minweight[i][j];
+                                    count++;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            if(count == minweight.Count)
+                            {
+                                index = i;
+                                minSum = tmpSum;
+                            }
+                        }
+                        Console.WriteLine("Мин вершина - " +index +" с мин суммой до всех вершин - "+minSum);
+
+                        Console.WriteLine();
+                        break;
+                    case 12:
+                        Console.WriteLine();
+                        graph.SetMatrix();
+                        graph.ShowMatrix();
+                        graph.SetParent();
+                        int[,] prev = graph.GetParent;
+
+                        for (int i = 0; i < prev.GetLength(1); i++)
+                        {
+                            for (int j = 0; j < prev.GetLength(1); j++)
+                            {
+                                Console.Write(prev[i, j] + " ");
+                            }
+                            Console.WriteLine();
+                        }
+
+                        graph.Floyd();
+                        int[,] matrix = graph.GetMatrix;
+
+                        for (int i = 0; i < matrix.GetLength(1); i++)
+                        {
+                            for (int j = 0; j < matrix.GetLength(1); j++)
+                            {
+                                Console.Write(matrix[i,j]+" ");
+                            }
+                            Console.WriteLine();
+                        }
+
+                        prev = graph.GetParent;
+
+                        for (int i = 0; i < prev.GetLength(1); i++)
+                        {
+                            for (int j = 0; j < prev.GetLength(1); j++)
+                            {
+                                Console.Write(prev[i, j] + " ");
+                            }
+                            Console.WriteLine();
+                        }
+
+                        Console.WriteLine("Введите вершину u1: ");
+                        int u1 = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Введите вершину u2: ");
+                        int u2 = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Введите вершину v: ");
+                        int v = Convert.ToInt32(Console.ReadLine());
+                        if (matrix[u1, v] == int.MaxValue)
+                        {
+                            Console.WriteLine("Такого пути нет из u1 в v");
+                        }
+                        int c = u1;
+                        while (c != v)
+                        {
+                            Console.WriteLine(c + " ");
+                            c = prev[c, v];
+                        }
+
+                        if (matrix[u2, v] == int.MaxValue)
+                        {
+                            Console.WriteLine("Такого пути нет из u1 в v");
+                        }
+                        c = u2;
+                        while (c != v)
+                        {
+                            Console.WriteLine(c + " ");
+                            c = prev[c, v];
+                        }
+                        break;
+                    case 13:
+                        Console.WriteLine();
+                        Console.WriteLine("Введите вершину u: ");
+                        int u = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Введите вершину v1: ");
+                        int v1 = Convert.ToInt32(Console.ReadLine());
+                        Console.WriteLine("Введите вершину v2: ");
+                        int v2 = Convert.ToInt32(Console.ReadLine());
+                        graph.SetEdge();
+                        Console.WriteLine();
+                        graph.BelmanFord(u,v1);
+                        Console.WriteLine();
+                        graph.BelmanFord(u, v2);
                         Console.WriteLine();
                         break;
                     case 0:

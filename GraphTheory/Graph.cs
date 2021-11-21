@@ -8,10 +8,30 @@ using System.Threading.Tasks;
 
 namespace GraphTheory
 {
+    public class Edge
+    {
+        public int _start;
+        public int _end;
+        public int _cost;
+
+        public Edge(int start, int end, int cost)
+        {
+            _start = start;
+            _end = end;
+            _cost = cost;
+        }
+    }
+
     class Graph
     {
         //список смежности
         private Dictionary<string, Dictionary<string, int>> _graph;
+        //матрица смежности
+        private int[,] matrix;
+        //матрица предков
+        private int[,] parent;
+        //список ребер
+        private List<Edge> edge;
         //(не)ориентированный
         private bool _oriented = true;
         //(не)взвешенный
@@ -48,6 +68,22 @@ namespace GraphTheory
                 return _graph;
             }
 
+        }
+        //получить матрицу
+        public int[,] GetMatrix
+        {
+            get
+            {
+                return matrix;
+            }
+        }
+        //получить матрицу
+        public int[,] GetParent
+        {
+            get
+            {
+                return parent;
+            }
         }
 
         //конструктор по умолчанию
@@ -106,6 +142,67 @@ namespace GraphTheory
                         tempNextNodes.Add(nodeStr[0], Convert.ToInt32(nodeStr[1]));
                     }
                     _graph.Add(nodesStr[0], tempNextNodes);
+                }
+            }
+        }
+
+        //создание матрицы смежности
+        public void SetMatrix()
+        {
+            matrix = new int[_graph.Count, _graph.Count];
+            parent = new int[_graph.Count, _graph.Count];
+            foreach (var items in _graph)
+            {
+                int i = Convert.ToInt32(items.Key);
+                foreach (var item in items.Value)
+                {
+                    int j = Convert.ToInt32(item.Key);
+                    matrix[i, j] = item.Value;
+                }
+            }
+            for (int index = 0; index < matrix.GetLength(0); index++)
+            {
+                for (int jndex = 0; jndex < matrix.GetLength(1); jndex++)
+                {
+                    if (index == jndex || matrix[index, jndex] == 0)
+                    {
+                        matrix[index, jndex] = int.MaxValue;
+                    }
+                }
+            }
+        }
+
+        //создание матрицы смежности
+        public void SetParent()
+        {
+            parent = new int[_graph.Count, _graph.Count];
+            for (int index = 0; index < parent.GetLength(0); index++)
+            {
+                for (int jndex = 0; jndex < parent.GetLength(1); jndex++)
+                {
+                    if(matrix[index,jndex] == int.MaxValue)
+                    {
+                        parent[index, jndex] = -1;
+                    }
+                    else
+                    {
+                        parent[index, jndex] = index + 1;
+                    }
+                }
+            }
+        }
+
+
+        //создание списка ребер
+        public void SetEdge()
+        {
+            edge = new List<Edge>();
+            foreach(var items in _graph)
+            {
+                foreach(var item in items.Value)
+                {
+                    Edge tmp = new Edge(Convert.ToInt32(items.Key), Convert.ToInt32(item.Key), item.Value);
+                    edge.Add(tmp);
                 }
             }
         }
@@ -284,10 +381,13 @@ namespace GraphTheory
             }
             while (vertex.Count != 0){
                 string vrtx = vertex.Peek();
-                if (usedNodes[vrtx] == false){
+                if (usedNodes[vrtx] == false)
+                {
                     usedNodes[vrtx] = true;
-                    foreach (var ver in _graph[vrtx]){
-                        if (usedNodes.Keys.Contains(ver.Key) && usedNodes[ver.Key] == false){
+                    foreach (var ver in _graph[vrtx])
+                    {
+                        if (usedNodes.Keys.Contains(ver.Key) && usedNodes[ver.Key] == false)
+                        {
                             usedNodes[ver.Key] = true;
                             vertex.Enqueue(ver.Key);
                         }
@@ -313,8 +413,174 @@ namespace GraphTheory
             Console.WriteLine();
         }
 
-        //вывод в консоль
-        public void ShowToConsole()
+        //алгоритм Флойда
+        public void Floyd()
+        {
+            for (int k = 0; k < _graph.Count; k++)
+            {
+                for (int i = 0; i < _graph.Count; i++)
+                {
+                    for (int j = 0; j < _graph.Count; j++)
+                    {
+                        if(matrix[i,k] < int.MaxValue && matrix[k,j] < int.MaxValue)
+                        {
+                            matrix[i, j] = Math.Min(matrix[i,j], matrix[i,k] + matrix[k, j]);
+                            parent[i, j] = parent[i,k];
+                        }
+                    }
+                }
+            }
+        }
+
+        //алгоритм Дейкстры
+        public List<int> Dijkstra(int st)
+        {
+            List<int> minWeight = new List<int>(_graph.Count);
+            for (int i = 0; i < _graph.Count; i++)
+            {
+                minWeight.Add(0);
+            }
+            bool[] visited = new bool[_graph.Count];
+            for (int i = 0; i < _graph.Count; i++)
+            {
+                if (_graph.ContainsKey(Convert.ToString(st)) && _graph[Convert.ToString(st)].ContainsKey(Convert.ToString(i)))
+                {
+                    minWeight[i] = _graph[Convert.ToString(st)][Convert.ToString(i)];
+                }    
+                else
+                {
+                    minWeight[i] = int.MaxValue;
+                }
+                visited[i] = false;
+            }
+            minWeight[st] = 0;
+            int index = 0;
+            int u = 0;
+
+            List<int> p = new List<int>();
+            for (int k = 0; k < _graph.Count; k++)
+            {
+                p.Add(-1);
+            }
+            p[st] = st;
+            for (int i = 0; i < _graph.Count; i++)
+            {
+                int min = int.MaxValue;
+                for (int j = 0; j < _graph.Count; j++)
+                {
+                    if (!visited[j] && minWeight[j] < min)
+                    {
+                        min = minWeight[j];
+                        index = j;
+                    }
+                }
+                u = index;
+                visited[u] = true;
+
+                for (int j = 0; j < _graph.Count; j++)
+                {
+                    if (_graph.ContainsKey(Convert.ToString(u)) && _graph[Convert.ToString(u)].ContainsKey(Convert.ToString(j)))
+                    {
+                        int value = _graph[Convert.ToString(u)][Convert.ToString(j)];
+                        if (_graph.ContainsKey(Convert.ToString(u)) && _graph[Convert.ToString(u)].ContainsKey(Convert.ToString(j)))
+                        {
+                            if (!visited[j] && value != int.MaxValue && minWeight[u] != int.MaxValue && (minWeight[u] + value < minWeight[j]))
+                            {
+                                minWeight[j] = minWeight[u] + value;
+                            }    
+                            p[j] = u;
+                        }
+                    }
+                }
+            }
+            return minWeight;
+        }
+
+        //алгоритм Беллмана-Форда
+        public void BelmanFord(int st,int v)
+        {
+            if(st > _graph.Count)
+            {
+                return;
+            }
+
+            List<int> d = new List<int>();
+            for(int i=0; i < _graph.Count; i++)
+            {
+                d.Add(int.MaxValue);
+            }
+            d[st] = 0;
+
+            List<int> p = new List<int>();
+            for (int i = 0; i < _graph.Count; i++)
+            {
+                p.Add(-1);
+            }
+            int x = -1;
+            for (int i=0; i< _graph.Count; i++)
+            {
+                x = -1;
+                for(int j=0; j<edge.Count;j++)
+                {
+                    if (d[edge[j]._start] < int.MaxValue)
+                    {
+                        if (d[edge[j]._end] > d[edge[j]._start] + edge[j]._cost)
+                        {
+                            d[edge[j]._end] = Math.Max(int.MinValue,d[edge[j]._start] + edge[j]._cost);
+                            p[edge[j]._end] = edge[j]._start;
+                            x = edge[j]._end;
+                        }
+                    }
+                }
+            }
+            if(d[v] == int.MaxValue)
+            {
+                Console.WriteLine("Путя нет");
+                return;
+            }
+            if(x == -1)
+            {
+                Console.WriteLine("Нет отрицательных циклов");
+                List<int> path = new List<int>();
+                for (int cur = v; cur != -1; cur = p[cur])
+                {
+                    path.Add(cur);
+                }
+                path.Reverse();
+                Console.WriteLine();
+                for (int i = 0; i < path.Count; i++)
+                {
+                    Console.Write(path[i] + " ");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Есть отрицательный цикл");
+                int y = x;
+                for(int i=0;i< _graph.Count; i++)
+                {
+                    y = p[y];
+                }
+                List<int> path = new List<int>();
+                for (int cur = y; ; cur = p[cur])
+                {
+                    path.Add(cur);
+                    if (cur == y && path.Count > 1)
+                    {
+                        break;
+                    }
+                }
+                path.Reverse();
+                Console.WriteLine("Вывод отрицательного цикла");
+                for(int i=0;i<path.Count;i++)
+                {
+                    Console.Write(path[i] + " ");
+                }
+            }
+        }
+
+        //вывод в консоль список смежности
+        public void ShowLstVertex()
         {
             foreach (var keyValue in _graph)
             {
@@ -333,6 +599,35 @@ namespace GraphTheory
                 Console.WriteLine();
             }
             Console.WriteLine();
+        }
+
+        //вывод матрицы смежности
+        public void ShowMatrix()
+        {
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    if (matrix[i,j] == int.MaxValue)
+                    {
+                        Console.Write("oo\t");
+                    }
+                    else
+                    {
+                        Console.Write(matrix[i,j]+ "\t");
+                    }
+                }
+                Console.WriteLine();
+            }
+        }
+
+        //вывод списка ребер
+        public void ShowEdge()
+        {
+            foreach(var item in edge)
+            {
+                Console.WriteLine("({0},{1}):{2}", item._start, item._end, item._cost);
+            }
         }
 
         //вывод в файл
