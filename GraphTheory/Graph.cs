@@ -10,11 +10,11 @@ namespace GraphTheory
 {
     public class Edge
     {
-        public int _start;
-        public int _end;
+        public string _start;
+        public string _end;
         public int _cost;
 
-        public Edge(int start, int end, int cost)
+        public Edge(string start, string end, int cost)
         {
             _start = start;
             _end = end;
@@ -27,7 +27,7 @@ namespace GraphTheory
         //список смежности
         private Dictionary<string, Dictionary<string, int>> _graph;
         //матрица смежности
-        private int[,] matrix;
+        public int[,] matrix;
         //матрица предков
         private int[,] parent;
         //список ребер
@@ -201,7 +201,7 @@ namespace GraphTheory
             {
                 foreach(var item in items.Value)
                 {
-                    Edge tmp = new Edge(Convert.ToInt32(items.Key), Convert.ToInt32(item.Key), item.Value);
+                    Edge tmp = new Edge(items.Key,item.Key, item.Value);
                     edge.Add(tmp);
                 }
             }
@@ -370,37 +370,38 @@ namespace GraphTheory
             return count;
         }
 
-        //компоненты связности
-        public void BFS(ref Dictionary<string,bool> usedNodes){
-            Queue<string> vertex = new Queue<string>();
-            foreach (var item in usedNodes){
-                if (item.Value == false){
-                    vertex.Enqueue(item.Key);
+        //обход в ширину
+        public List<string> BFS(ref Dictionary<string, bool> usedNodes)
+        {
+            Queue<string> nodes = new Queue<string>();
+            string tmp ="";
+            foreach (var item in usedNodes)
+            {
+                if (item.Value == false)
+                {
+                    tmp = item.Key;
+                    nodes.Enqueue(item.Key);
                     break;
                 }
             }
-            while (vertex.Count != 0){
-                string vrtx = vertex.Peek();
-                if (usedNodes[vrtx] == false)
+            usedNodes[tmp] = true;
+
+            while (nodes.Count != 0){
+                string vrtx = nodes.Peek();
+                nodes.Dequeue();
+                foreach (var ver in _graph[vrtx])
                 {
-                    usedNodes[vrtx] = true;
-                    foreach (var ver in _graph[vrtx])
+                    if (usedNodes.Keys.Contains(ver.Key) && usedNodes[ver.Key] == false)
                     {
-                        if (usedNodes.Keys.Contains(ver.Key) && usedNodes[ver.Key] == false)
-                        {
-                            usedNodes[ver.Key] = true;
-                            vertex.Enqueue(ver.Key);
-                        }
+                        usedNodes[ver.Key] = true;
+                        nodes.Enqueue(ver.Key);
                     }
                 }
-                else{
-                    vertex.Dequeue();
-                }
             }
-            Console.Write("Компонента: ");
+            List<string> lst = new List<string>();
             foreach (var component in usedNodes){
                 if (component.Value == true)
-                    Console.Write(component.Key + " ");
+                    lst.Add(component.Key);
             }
             Dictionary<string, bool> tempDic = new Dictionary<string, bool>();
             foreach (var item in usedNodes){
@@ -411,6 +412,62 @@ namespace GraphTheory
             foreach (var item in tempDic)
                 usedNodes.Add(item.Key, item.Value);
             Console.WriteLine();
+            return lst;
+        }
+
+        //обход в глубину
+        public void DFS(ref Dictionary<string, bool> usedNodes)
+        {
+            Queue<string> vertex = new Queue<string>();
+            foreach (var item in usedNodes)
+            {
+                if (item.Value == false)
+                {
+                    vertex.Enqueue(item.Key);
+                    break;
+                }
+            }
+        }
+
+        //алгоритм Прима
+        public List<Edge> Prima(List<string> notUseV)
+        {
+            //неиспользованные ребра
+            SetEdge();
+            //использованные вершины
+            List<string> useV = new List<string>();
+            //неиспользованные вершины
+            List<Edge> MST = new List<Edge>();
+            useV.Add(notUseV[0]);
+            notUseV.Remove(notUseV[0]);
+            string v;
+            string curV = notUseV[0];
+            while (notUseV.Count > 0)
+            {
+                int minE = -1;
+                int min = int.MaxValue;
+                //поиск наим ребра
+                for (int i = 0; i < edge.Count; i++)
+                {
+                    if (useV.IndexOf(edge[i]._start) != -1 && useV.IndexOf(edge[i]._end) == -1)
+                    {
+                        if (min > edge[i]._cost)
+                        {
+                            min = edge[i]._cost;
+                            curV = edge[i]._end;
+                            minE = i;
+                        }
+                    }
+                }
+                v = curV;
+                useV.Add(v);
+                notUseV.Remove(notUseV[0]);
+                if(minE >= 0)
+                {
+                    MST.Add(edge[minE]);
+                }
+            }
+            return MST;
         }
 
         //алгоритм Флойда
@@ -497,29 +554,24 @@ namespace GraphTheory
         }
 
         //алгоритм Беллмана-Форда
-        public void BelmanFord(int st,int v)
+        public void BelmanFord(string st,string v)
         {
-            if(st > _graph.Count)
+            Dictionary<string, int> d = new Dictionary<string, int>();
+            foreach(var item in _graph)
             {
-                return;
-            }
-
-            List<int> d = new List<int>();
-            for(int i=0; i < _graph.Count; i++)
-            {
-                d.Add(int.MaxValue);
+                d.Add(item.Key,int.MaxValue);
             }
             d[st] = 0;
 
-            List<int> p = new List<int>();
-            for (int i = 0; i < _graph.Count; i++)
+            Dictionary<string,string> p = new Dictionary<string, string>();
+            foreach (var item in _graph)
             {
-                p.Add(-1);
+                p.Add(item.Key,"");
             }
-            int x = -1;
+            string x = "";
             for (int i=0; i< _graph.Count; i++)
             {
-                x = -1;
+                x = "";
                 for(int j=0; j<edge.Count;j++)
                 {
                     if (d[edge[j]._start] < int.MaxValue)
@@ -533,16 +585,15 @@ namespace GraphTheory
                     }
                 }
             }
-            if(d[v] == int.MaxValue)
+            if (d[v] == int.MaxValue)
             {
-                Console.WriteLine("Путя нет");
+                Console.WriteLine("Пути нет");
                 return;
             }
-            if(x == -1)
+            if(x == "")
             {
-                Console.WriteLine("Нет отрицательных циклов");
-                List<int> path = new List<int>();
-                for (int cur = v; cur != -1; cur = p[cur])
+                List<string> path = new List<string>();
+                for (string cur = v; cur != ""; cur = p[cur])
                 {
                     path.Add(cur);
                 }
@@ -556,13 +607,13 @@ namespace GraphTheory
             else
             {
                 Console.WriteLine("Есть отрицательный цикл");
-                int y = x;
+                string y = x;
                 for(int i=0;i< _graph.Count; i++)
                 {
                     y = p[y];
                 }
-                List<int> path = new List<int>();
-                for (int cur = y; ; cur = p[cur])
+                List<string> path = new List<string>();
+                for (string cur = y; ; cur = p[cur])
                 {
                     path.Add(cur);
                     if (cur == y && path.Count > 1)

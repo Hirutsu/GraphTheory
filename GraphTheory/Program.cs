@@ -93,10 +93,11 @@ namespace GraphTheory
                 Console.WriteLine("7.Вывести все изолированные вершины");
                 Console.WriteLine("8.Вывести все вершины,не смежные с данной");
                 Console.WriteLine("9.Удалить висячие вершины");
-                Console.WriteLine("10.Вывести компонент связности!");
+                Console.WriteLine("10.Вывести компонент связности! - ОБХОД В ГЛУБИНУ");
                 Console.WriteLine("11.Найти вершину, сумма длин кратчайших путей от которой до остальных вершин минимальна.(6) - ДЕЙКСТРА");
                 Console.WriteLine("12.Вывести кратчайшие пути из вершин u1 и u2 до v.(15) - ФЛОЙД");
                 Console.WriteLine("13.Вывести кратчайшие пути из вершины u до v1 и v2.(13) - БЕЛМАН");
+                Console.WriteLine("14.Алгоритм Прима");
                 Console.WriteLine("0.Выйти из програамы");
                 Console.Write("Введите число:");
                 Int32.TryParse(Console.ReadLine(),out num);
@@ -283,13 +284,23 @@ namespace GraphTheory
                         Console.WriteLine("Происходит поиск компонент связности...");
                         nodes = graph.GetNodes();
                         Dictionary<string, bool> usedNodes = new Dictionary<string, bool>();
+                        List<List<string>> component = new List<List<string>>();
                         for (int i = 0; i< nodes.Length; i++)
                         {
                             usedNodes.Add(nodes[i],false);
                         }
                         while(usedNodes.Count != 0)
                         {
-                            graph.BFS(ref usedNodes);
+                            component.Add(graph.BFS(ref usedNodes));
+                        }
+                        for (int i = 0; i < component.Count; i++)
+                        {
+                            Console.WriteLine("Компонента");
+                            for (int j = 0; j < component[i].Count; j++)
+                            {
+                                Console.Write(component[i][j]+" ");
+                            }
+                            Console.WriteLine();
                         }
                         Console.WriteLine();
                         break;
@@ -410,16 +421,49 @@ namespace GraphTheory
                     case 13:
                         Console.WriteLine();
                         Console.WriteLine("Введите вершину u: ");
-                        int u = Convert.ToInt32(Console.ReadLine());
+                        string u = Console.ReadLine();
                         Console.WriteLine("Введите вершину v1: ");
-                        int v1 = Convert.ToInt32(Console.ReadLine());
+                        string v1 = Console.ReadLine();
                         Console.WriteLine("Введите вершину v2: ");
-                        int v2 = Convert.ToInt32(Console.ReadLine());
+                        string v2 = Console.ReadLine();
                         graph.SetEdge();
                         Console.WriteLine();
                         graph.BelmanFord(u,v1);
                         Console.WriteLine();
                         graph.BelmanFord(u, v2);
+                        Console.WriteLine();
+                        break;
+                    case 14:
+                        Console.WriteLine();
+
+                        nodes = graph.GetNodes();
+                        usedNodes = new Dictionary<string, bool>();
+                        component = new List<List<string>>();
+                        for (int i = 0; i < nodes.Length; i++)
+                        {
+                            usedNodes.Add(nodes[i], false);
+                        }
+                        while (usedNodes.Count != 0)
+                        {
+                            component.Add(graph.BFS(ref usedNodes));
+                        }
+                        List<Edge> mst = new List<Edge>();
+                        for (int i = 0; i < component.Count; i++)
+                        {
+                            if(component[i].Count <= 1)
+                            {
+                                Console.WriteLine("Найдены компанента с 1ой вершиной:" + component[i][0]);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Оставное дерево:");
+                                mst =  graph.Prima(component[i]);
+                                foreach (var item in mst)
+                                {
+                                    Console.WriteLine("({0},{1}:{2})",item._start,item._end,item._cost);
+                                }
+                            }
+                        }
                         Console.WriteLine();
                         break;
                     case 0:
